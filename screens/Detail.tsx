@@ -2,6 +2,7 @@
 import {View, Text, SafeAreaView, Button} from 'react-native';
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Notification from '../Notification';
 
 export default function Detail({
   route,
@@ -10,7 +11,17 @@ export default function Detail({
   route: any;
   navigation: any;
 }) {
-  const {savedReminder} = route.params;
+  const {savedReminder} = route.params || {};
+
+  if (!savedReminder) {
+    return (
+      <SafeAreaView>
+        <View style={{padding: 15}}>
+          <Text>No reminder found</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView>
@@ -22,6 +33,7 @@ export default function Detail({
           title="Delete Reminder"
           onPress={() => {
             AsyncStorage.removeItem('reminder');
+            Notification.cancelNotification();
             navigation.navigate('Home', {refresh: true});
           }}
         />

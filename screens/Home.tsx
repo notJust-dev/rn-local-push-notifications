@@ -31,7 +31,6 @@ export default function Home({navigation, route}: any) {
   }, []);
 
   React.useEffect(() => {
-    console.log('ROUTE PARAMS ', route.params);
     if (route.params?.refresh) {
       getReminder().then(data => {
         setSavedReminder(data);
@@ -42,7 +41,6 @@ export default function Home({navigation, route}: any) {
   const getReminder = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('reminder');
-      console.log('JSON VAL ', jsonValue);
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
       console.log(e);

@@ -5,6 +5,7 @@ import notifee, {
   TimestampTrigger,
   TriggerType,
 } from '@notifee/react-native';
+import * as RootNavigation from './RootNavigation';
 
 class Notifications {
   constructor() {
@@ -33,12 +34,18 @@ class Notifications {
     notifee
       .getTriggerNotificationIds()
       .then(ids => console.log('All trigger notifications: ', ids));
+    notifee
+      .getTriggerNotifications()
+      .then(notifications =>
+        console.log('All trigger notifications: ', notifications),
+      );
     // notifee.cancelAllNotifications()
   }
 
   public handleNotificationOpen(notification: Notification) {
     const {data} = notification;
     console.log('Notification received: foreground', data);
+    RootNavigation.navigate('Detail', {savedReminder: data?.details});
   }
 
   public async bootstrap() {
@@ -98,14 +105,18 @@ class Notifications {
             id: '1',
             action: 'reminder',
             details: {
-              reminder,
-              date,
+              name: reminder,
+              date: date.toString(),
             },
           },
         },
         trigger,
       );
     }
+  }
+
+  public async cancelNotification() {
+    await notifee.cancelNotification('1');
   }
 }
 
