@@ -12,7 +12,7 @@ import React, {useState} from 'react';
 import DatePicker from 'react-native-date-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Home() {
+export default function Home({navigation}: any) {
   const [savedReminder, setSavedReminder] = useState<{
     name: string;
     date: string;
@@ -76,13 +76,18 @@ export default function Home() {
       </Pressable>
 
       <Button title="Save" onPress={saveReminder} />
-      <View style={{flex: 1, padding: 20}}>
+
+      <Pressable
+        onPress={() => {
+          navigation.navigate('Detail', {savedReminder});
+        }}
+        style={{flex: 1, padding: 20}}>
         <View>
           <Text style={styles.header}>Saved Reminder</Text>
           <Text>Reminder Name --- {savedReminder.name}</Text>
           <Text>Date --- {savedReminder.date}</Text>
         </View>
-      </View>
+      </Pressable>
 
       <DatePicker
         modal
