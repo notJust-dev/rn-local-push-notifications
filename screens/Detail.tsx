@@ -3,7 +3,13 @@ import {View, Text, SafeAreaView, Button} from 'react-native';
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Detail({route}: any) {
+export default function Detail({
+  route,
+  navigation,
+}: {
+  route: any;
+  navigation: any;
+}) {
   const {savedReminder} = route.params;
 
   return (
@@ -16,6 +22,7 @@ export default function Detail({route}: any) {
           title="Delete Reminder"
           onPress={() => {
             AsyncStorage.removeItem('reminder');
+            navigation.navigate('Home', {refresh: true});
           }}
         />
       </View>

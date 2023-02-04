@@ -12,14 +12,11 @@ import React, {useState} from 'react';
 import DatePicker from 'react-native-date-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Home({navigation}: any) {
+export default function Home({navigation, route}: any) {
   const [savedReminder, setSavedReminder] = useState<{
     name: string;
     date: string;
-  }>({
-    name: '',
-    date: '',
-  });
+  } | null>(null);
   const [date, setDate] = useState(new Date());
   const [reminder, setReminder] = useState('');
   const [open, setOpen] = useState(false);
@@ -31,6 +28,15 @@ export default function Home({navigation}: any) {
       }
     });
   }, []);
+
+  React.useEffect(() => {
+    console.log('ROUTE PARAMS ', route.params);
+    if (route.params?.refresh) {
+      getReminder().then(data => {
+        setSavedReminder(data);
+      });
+    }
+  }, [route.params]);
 
   const getReminder = async () => {
     try {
@@ -61,6 +67,8 @@ export default function Home({navigation}: any) {
     });
   };
 
+  console.log('SAVED REMINDER ', savedReminder);
+
   return (
     <SafeAreaView style={styles.container}>
       <TextInput
@@ -81,12 +89,16 @@ export default function Home({navigation}: any) {
         onPress={() => {
           navigation.navigate('Detail', {savedReminder});
         }}
-        style={{flex: 1, padding: 20}}>
-        <View>
-          <Text style={styles.header}>Saved Reminder</Text>
-          <Text>Reminder Name --- {savedReminder.name}</Text>
-          <Text>Date --- {savedReminder.date}</Text>
-        </View>
+        style={{padding: 20}}>
+        {savedReminder ? (
+          <View>
+            <Text style={styles.header}>Saved Reminder</Text>
+            <Text>Reminder Name --- {savedReminder?.name}</Text>
+            <Text>Date --- {savedReminder?.date}</Text>
+          </View>
+        ) : (
+          <Text>No Reminders Saved</Text>
+        )}
       </Pressable>
 
       <DatePicker
