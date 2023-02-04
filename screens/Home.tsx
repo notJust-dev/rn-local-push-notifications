@@ -11,6 +11,7 @@ import {
 import React, {useState} from 'react';
 import DatePicker from 'react-native-date-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Notification from '../Notification';
 
 export default function Home({navigation, route}: any) {
   const [savedReminder, setSavedReminder] = useState<{
@@ -65,9 +66,9 @@ export default function Home({navigation, route}: any) {
         setSavedReminder(data);
       }
     });
-  };
 
-  console.log('SAVED REMINDER ', savedReminder);
+    Notification.scheduleNotification({reminder, date: date});
+  };
 
   return (
     <SafeAreaView style={styles.container}>

@@ -1,16 +1,15 @@
 import notifee, {
   AuthorizationStatus,
   EventType,
-  RepeatFrequency,
+  Notification,
   TimestampTrigger,
   TriggerType,
-  Notification,
 } from '@notifee/react-native';
-import {AppState, Platform} from 'react-native';
 
 class Notifications {
   constructor() {
     this.bootstrap();
+
     notifee.onForegroundEvent(({type, detail}) => {
       switch (type) {
         case EventType.DISMISSED:
@@ -18,6 +17,7 @@ class Notifications {
           break;
         case EventType.PRESS:
           console.log('User pressed notification', detail.notification);
+          this.handleNotificationOpen(detail.notification as Notification);
           break;
       }
     });
@@ -36,13 +36,9 @@ class Notifications {
     // notifee.cancelAllNotifications()
   }
 
-  public async onMessageReceived(message) {
-    // Do something
-    console.log('Firebase Notification ', message);
-  }
-
   public handleNotificationOpen(notification: Notification) {
     const {data} = notification;
+    console.log('Notification received: foreground', data);
   }
 
   public async bootstrap() {
@@ -60,6 +56,7 @@ class Notifications {
       this.handleNotificationOpen(initialNotification.notification);
     }
   }
+
   public async checkPermissions() {
     const settings = await notifee.requestPermission();
 
@@ -71,12 +68,45 @@ class Notifications {
       return false;
     }
   }
-}
 
-AppState.addEventListener('change', state => {
-  if (state === 'active') {
-    notifee.setBadgeCount(0).then(() => console.log('Badge count removed'));
+  public async scheduleNotification({
+    reminder,
+    date,
+  }: {
+    reminder: string;
+    date: Date;
+  }) {
+    const hasPermissions = await this.checkPermissions();
+    if (hasPermissions) {
+      const trigger: TimestampTrigger = {
+        type: TriggerType.TIMESTAMP,
+        timestamp: +date,
+      };
+
+      await notifee.createTriggerNotification(
+        {
+          id: '1',
+          title: `🔔 You asked for this reminder -  ${reminder}`,
+          body: 'Tap on it to check',
+          android: {
+            channelId: 'reminder',
+            pressAction: {
+              id: 'default',
+            },
+          },
+          data: {
+            id: '1',
+            action: 'reminder',
+            details: {
+              reminder,
+              date,
+            },
+          },
+        },
+        trigger,
+      );
+    }
   }
-});
+}
 
 export default new Notifications();
